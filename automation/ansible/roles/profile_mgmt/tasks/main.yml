@@ -1,0 +1,29 @@
+---
+- name: Create empty local file on automation machine
+  file:
+    path: "{{ local_file_path }}"
+    state: touch
+  delegate_to: localhost
+  become: false
+
+- name: Copy locfile to managed node under /tmp
+  copy:
+    src: "{{ local_file_path }}"
+    dest: "{{ remote_file_path }}"
+    owner: "{{ remote_file_owner }}"
+    group: "{{ remote_file_group }}"
+    mode: "{{ remote_file_mode }}"
+
+- name: Display status of remote locfile
+  stat:
+    path: "{{ remote_file_path }}"
+  register: locfile_status
+
+- name: Show remote locfile status
+  debug:
+    var: locfile_status
+
+- name: Create empty file in home directory on managed node
+  file:
+    path: "{{ home_file_path }}"
+    state: touch

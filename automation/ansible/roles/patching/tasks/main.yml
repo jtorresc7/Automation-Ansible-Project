@@ -1,0 +1,14 @@
+---
+- name: Update all installed packages on RedHat/CentOS
+  package:
+    name: '*'
+    state: latest
+  when: ansible_os_family == "RedHat"
+  notify: reboot managed node
+
+- name: Update all installed packages on Ubuntu
+  apt:
+    upgrade: dist
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+  notify: reboot managed node

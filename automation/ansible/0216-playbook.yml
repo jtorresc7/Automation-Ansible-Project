@@ -1,0 +1,9 @@
+---
+- name: Configure all Linux VMs
+  hosts: linux
+  become: true
+  roles:
+    - profile-0216
+    - user-0216
+    - datadisk-0216
+    - webserver-0216

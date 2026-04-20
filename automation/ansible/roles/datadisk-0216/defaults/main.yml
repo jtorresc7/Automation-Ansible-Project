@@ -1,0 +1,14 @@
+---
+disk_device: /dev/sdc
+
+part1_number: 1
+part1_start: 1MiB
+part1_end: 4GiB
+part1_fs: xfs
+part1_mount: /part1
+
+part2_number: 2
+part2_start: 4GiB
+part2_end: 9GiB
+part2_fs: ext4
+part2_mount: /part2

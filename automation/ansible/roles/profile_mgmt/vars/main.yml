@@ -1,0 +1,7 @@
+---
+local_file_path: /home/n01750216/automation/ansible/locfile
+remote_file_path: /tmp/locfile
+remote_file_owner: azureuser
+remote_file_group: root
+remote_file_mode: '0444'
+home_file_path: /home/azureuser/emptyfile

@@ -1,0 +1,12 @@
+---
+- name: Remove packages on RedHat/CentOS
+  package:
+    name: "{{ packages }}"
+    state: absent
+  when: ansible_os_family == "RedHat"
+
+- name: Remove packages on Ubuntu
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  when: ansible_os_family == "Debian"

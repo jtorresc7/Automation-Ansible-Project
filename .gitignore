@@ -1,0 +1,11 @@
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/crash.log
+**/.ansible/
+**/*.retry
+**/*.pem
+**/id_rsa
+**/id_rsa.pub
+**/.terraform.lock.hcl
+

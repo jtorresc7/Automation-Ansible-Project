@@ -1,0 +1,15 @@
+[linux]
+linux-0216-linux1.eastus2.cloudapp.azure.com ansible_user=azureuser ansible_ssh_private_key_file=/home/n01750216/.ssh/id_rsa
+linux-0216-linux2.eastus2.cloudapp.azure.com ansible_user=azureuser ansible_ssh_private_key_file=/home/n01750216/.ssh/id_rsa
+linux-0216-linux3.eastus2.cloudapp.azure.com ansible_user=azureuser ansible_ssh_private_key_file=/home/n01750216/.ssh/id_rsa
+
+[windows]
+a0216cw1.eastus2.cloudapp.azure.com
+
+[windows:vars]
+ansible_user=azureuser
+ansible_password=Password1234!
+ansible_connection=winrm
+ansible_port=5985
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore

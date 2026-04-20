@@ -1,0 +1,3 @@
+apache_service: httpd
+web_root: /var/www/html
+web_file_mode: "0444"

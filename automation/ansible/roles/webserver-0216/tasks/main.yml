@@ -1,0 +1,151 @@
+---
+
+- name: Remove old repo files
+  become: true
+  shell: |
+    rm -f /etc/yum.repos.d/*.repo
+
+- name: Create CentOS Vault repo file
+  become: true
+  copy:
+    dest: /etc/yum.repos.d/CentOS-Vault.repo
+    content: |
+      [BaseOS]
+      name=CentOS-8 - BaseOS
+      baseurl=http://vault.centos.org/8.5.2111/BaseOS/x86_64/os/
+      enabled=1
+      gpgcheck=0
+
+      [AppStream]
+      name=CentOS-8 - AppStream
+      baseurl=http://vault.centos.org/8.5.2111/AppStream/x86_64/os/
+      enabled=1
+      gpgcheck=0
+
+      [extras]
+      name=CentOS-8 - Extras
+      baseurl=http://vault.centos.org/8.5.2111/extras/x86_64/os/
+      enabled=1
+      gpgcheck=0
+  when: ansible_distribution == "CentOS"
+
+- name: Clean dnf cache
+  become: true
+  shell: |
+    dnf clean all
+    rm -rf /var/cache/dnf
+  when: ansible_os_family == "RedHat"
+
+- name: Build dnf cache
+  become: true
+  shell: dnf makecache
+  when: ansible_os_family == "RedHat"
+
+- name: Install Apache (RHEL-based)
+  become: true
+  shell: dnf install -y httpd
+  when: ansible_os_family == "RedHat"
+  notify: restart apache
+
+- name: Install Apache (Debian-based)
+  become: true
+  apt:
+    name: apache2
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+  notify: restart apache
+
+
+#- name: Fix CentOS 8 repositories
+#  become: true
+#  shell: |
+#    sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+#    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+#    yum clean all
+#    yum makecache
+#  when: ansible_distribution == "CentOS"
+
+#- name: Update yum cache
+#  become: true
+#  yum:
+#    update_cache: yes
+
+#- name: Enable AppStream repo (CentOS 8)
+#  become: true
+#  shell: |
+#    dnf config-manager --set-enabled AppStream || true
+
+#- name: Install Apache (RHEL-based)
+#  become: true
+#  shell: |
+#    yum install -y httpd
+#  when: ansible_os_family == "RedHat"
+#  notify: restart apache#
+#
+#- name: Install Apache (Debian-based)
+#  become: true
+#  apt:
+#    name: apache2
+#    state: present
+#    update_cache: yes
+#  when: ansible_os_family == "Debian"
+#  notify: restart apache
+
+- name: Create HTML file on automation server for vm1
+  become: false  
+  delegate_to: localhost
+  copy:
+    dest: "{{ role_path }}/files/vm1.html"
+    content: "{{ hostvars[groups['linux'][0]].ansible_fqdn }}\n"
+    mode: "0644"
+
+- name: Create HTML file on automation server for vm2
+  become: false
+  delegate_to: localhost
+  copy:
+    dest: "{{ role_path }}/files/vm2.html"
+    content: "{{ hostvars[groups['linux'][1]].ansible_fqdn }}\n"
+    mode: "0644"
+
+- name: Create HTML file on automation server for vm3
+  become: false
+  delegate_to: localhost
+  copy:
+    dest: "{{ role_path }}/files/vm3.html"
+    content: "{{ hostvars[groups['linux'][2]].ansible_fqdn }}\n"
+    mode: "0644"
+
+- name: Copy vm1.html to vm1 as index.html
+  become: true
+  copy:
+    src: vm1.html
+    dest: "{{ web_root }}/index.html"
+    mode: "{{ web_file_mode }}"
+  when: inventory_hostname == groups['linux'][0]
+  notify: restart apache
+
+- name: Copy vm2.html to vm2 as index.html
+  become: true
+  copy:
+    src: vm2.html
+    dest: "{{ web_root }}/index.html"
+    mode: "{{ web_file_mode }}"
+  when: inventory_hostname == groups['linux'][1]
+  notify: restart apache
+
+- name: Copy vm3.html to vm3 as index.html
+  become: true
+  copy:
+    src: vm3.html
+    dest: "{{ web_root }}/index.html"
+    mode: "{{ web_file_mode }}"
+  when: inventory_hostname == groups['linux'][2]
+  notify: restart apache
+
+- name: Ensure Apache is started and enabled
+  become: true
+  service:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: true

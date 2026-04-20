@@ -1,0 +1,22 @@
+---
+- name: Insert FileCreateMode line at end of rsyslog.conf
+  blockinfile:
+    path: /etc/rsyslog.conf
+    block: |
+      $FileCreateMode 0640
+    insertafter: EOF
+  notify: restart rsyslog
+
+- name: Set ownership and permissions on /etc/rsyslog.d recursively
+  file:
+    path: /etc/rsyslog.d
+    owner: root
+    group: root
+    mode: '0640'
+    recurse: yes
+  notify: restart rsyslog
+
+- name: Set permissions on /var/log
+  file:
+    path: /var/log
+    mode: '0775'

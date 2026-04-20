@@ -1,0 +1,12 @@
+---
+redhat_packages:
+  - cifs-utils
+  - nfs-utils
+  - audit
+  - chrony
+
+ubuntu_packages:
+  - cifs-utils
+  - nfs-common
+  - auditd
+  - chrony

@@ -1,0 +1,19 @@
+---
+- name: Create cloudadmins group
+  become: true
+  group:
+    name: "{{ user_group_name }}"
+    state: present
+
+- name: Create users with SSH keys and no passphrase
+  become: true
+  user:
+    name: "{{ item }}"
+    groups: "{{ user_group_name }},wheel"
+    append: true
+    generate_ssh_key: true
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    ssh_key_passphrase: ""
+    state: present
+  loop: "{{ user_list }}"

@@ -1,0 +1,60 @@
+---
+- name: Create mount point for part1
+  become: true
+  file:
+    path: "{{ part1_mount }}"
+    state: directory
+    mode: "0755"
+
+- name: Create mount point for part2
+  become: true
+  file:
+    path: "{{ part2_mount }}"
+    state: directory
+    mode: "0755"
+
+- name: Create partition 1 on data disk
+  become: true
+  parted:
+    device: "{{ disk_device }}"
+    number: "{{ part1_number }}"
+    state: present
+    part_start: "{{ part1_start }}"
+    part_end: "{{ part1_end }}"
+
+- name: Create partition 2 on data disk
+  become: true
+  parted:
+    device: "{{ disk_device }}"
+    number: "{{ part2_number }}"
+    state: present
+    part_start: "{{ part2_start }}"
+    part_end: "{{ part2_end }}"
+
+- name: Create XFS filesystem on partition 1
+  become: true
+  filesystem:
+    fstype: "{{ part1_fs }}"
+    dev: "{{ disk_device }}{{ part1_number }}"
+
+- name: Create EXT4 filesystem on partition 2
+  become: true
+  filesystem:
+    fstype: "{{ part2_fs }}"
+    dev: "{{ disk_device }}{{ part2_number }}"
+
+- name: Mount partition 1 persistently
+  become: true
+  mount:
+    path: "{{ part1_mount }}"
+    src: "{{ disk_device }}{{ part1_number }}"
+    fstype: "{{ part1_fs }}"
+    state: mounted
+
+- name: Mount partition 2 persistently
+  become: true
+  mount:
+    path: "{{ part2_mount }}"
+    src: "{{ disk_device }}{{ part2_number }}"
+    fstype: "{{ part2_fs }}"
+    state: mounted
